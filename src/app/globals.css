@@ -1,0 +1,123 @@
+@import "tailwindcss";
+
+/* VVCE homepage concept — PulpLabs house style (after srikkec.pulplabs.ai):
+   warm paper ground, a soft display serif over a geometric sans, deep crest
+   navy with crest gold. */
+
+@theme {
+  --color-paper:    #f6f1e7;
+  --color-paper-2:  #efe7d8;
+  --color-card:     #fffdf8;
+  --color-navy:     #1c1d45;
+  --color-navy-2:   #2a2c63;
+  --color-navy-3:   #3c3f86;
+  --color-ink:      #1a1a2e;
+  --color-ink-2:    #45475c;
+  --color-muted:    #6f6f80;
+  --color-line:     #e4dccb;
+  --color-gold:     #e9a92b;
+  --color-gold-2:   #f6c65a;
+  --color-gold-wash:#fbecc8;
+  --color-coral:    #c2502f;   /* eyebrow labels: 4.9:1 on paper */
+  --color-green:    #2f7d55;
+  --color-sky:      #dfe8f8;
+  --color-mint:     #dff1e6;
+  --color-rose:     #fbe3dc;
+
+  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-sans:    var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+
+  --text-hero:  clamp(2.6rem, 1.4rem + 4.6vw, 5.4rem);
+  --text-h2:    clamp(2rem, 1.35rem + 2.3vw, 3.4rem);
+  --text-h3:    clamp(1.35rem, 1.15rem + 0.7vw, 1.75rem);
+  --text-lead:  clamp(1.05rem, 0.98rem + 0.35vw, 1.25rem);
+
+  --spacing-gutter:  clamp(1.25rem, 0.6rem + 2.6vw, 3rem);
+  --spacing-section: clamp(4.5rem, 3rem + 6vw, 9rem);
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* { min-width: 0; }
+html { -webkit-text-size-adjust: 100%; }
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+p { text-wrap: pretty; }
+.tnum { font-variant-numeric: tabular-nums; }
+:focus-visible { outline: 2.5px solid var(--color-gold); outline-offset: 3px; border-radius: 6px; }
+a, button { -webkit-tap-highlight-color: transparent; }
+::selection { background: var(--color-gold-wash); }
+
+.eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-coral);
+}
+
+/* ——— motion: progressive enhancement ————————————————————————————
+   `motion-ok` is added by an inline script only when scripting runs and the
+   visitor hasn't asked for reduced motion. Every hidden state below is scoped
+   to it, so with no JavaScript — or if the motion code never starts, which a
+   3-second failsafe in the same script checks — the page renders in full. */
+
+.motion-ok [data-reveal] { opacity: 0; transform: translate3d(0, 28px, 0); }
+.motion-ok [data-hero-line] { transform: translate3d(0, 110%, 0); }
+.motion-ok [data-hero-fade] { opacity: 0; transform: translate3d(0, 16px, 0); }
+.motion-ok [data-badge] { opacity: 0; }
+
+/* hero photograph: a slow push-in, the srikkec "hero-zoom" */
+@keyframes hero-zoom { from { transform: scale(1.12); } to { transform: scale(1); } }
+.motion-ok .hero-img { animation: hero-zoom 9s var(--ease-out-expo) both; }
+
+/* the live dot on the admissions card */
+@keyframes ping { 0% { transform: scale(1); opacity: .65; } 80%, 100% { transform: scale(2.6); opacity: 0; } }
+.ping::after {
+  content: ""; position: absolute; inset: 0; border-radius: 999px; background: inherit;
+  animation: ping 1.8s cubic-bezier(0, 0, .2, 1) infinite;
+}
+
+/* marquees: two identical tracks, each sliding its own width */
+@keyframes marquee { from { transform: translate3d(0,0,0); } to { transform: translate3d(-100%,0,0); } }
+@keyframes marquee-rev { from { transform: translate3d(-100%,0,0); } to { transform: translate3d(0,0,0); } }
+.marquee { display: flex; overflow: hidden; }
+.marquee > div { display: flex; flex-shrink: 0; animation: marquee var(--dur, 40s) linear infinite; }
+.marquee.rev > div { animation-name: marquee-rev; }
+.marquee:hover > div, .marquee:focus-within > div, .marquee[data-paused="true"] > div { animation-play-state: paused; }
+
+/* word-by-word reading reveal: words start faint and are inked in by scroll */
+.motion-ok [data-words] .w { opacity: .16; transition: none; }
+
+/* paper texture for the notice board */
+.cork {
+  background-color: #e8d9bb;
+  background-image:
+    radial-gradient(rgba(120, 84, 30, .12) 1px, transparent 1.4px),
+    radial-gradient(rgba(255, 255, 255, .35) 1px, transparent 1.4px);
+  background-size: 9px 9px, 13px 13px;
+  background-position: 0 0, 4px 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee > div { animation: none; }
+  .ping::after { animation: none; }
+}
