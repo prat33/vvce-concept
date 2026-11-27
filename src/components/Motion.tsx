@@ -74,6 +74,37 @@ export default function Motion() {
           gsap.to(batch, { opacity: 1, y: 0, duration: 1.05, ease: "expo.out", stagger: 0.08 }),
       });
 
+      // ——— section headings: words rise out of their masks, like the hero
+      ScrollTrigger.batch("[data-split]", {
+        start: "top 88%",
+        once: true,
+        onEnter: (batch) =>
+          batch.forEach((h, i) =>
+            gsap.to(h.querySelectorAll(".sw > span"), { y: 0, duration: 1.1, ease: "expo.out", stagger: 0.06, delay: i * 0.08 }),
+          ),
+      });
+
+      // ——— list rows slide in one after another
+      ScrollTrigger.batch("[data-row]", {
+        start: "top 92%",
+        once: true,
+        onEnter: (batch) => gsap.to(batch, { opacity: 1, x: 0, duration: 0.9, ease: "expo.out", stagger: 0.06 }),
+      });
+
+      // ——— admission codes pop in
+      ScrollTrigger.batch("[data-pop]", {
+        start: "top 94%",
+        once: true,
+        onEnter: (batch) => gsap.to(batch, { opacity: 1, scale: 1, duration: 0.8, ease: "back.out(1.8)", stagger: 0.07 }),
+      });
+
+      // ——— reading progress along the top edge
+      gsap.to("[data-progress]", {
+        scaleX: 1,
+        ease: "none",
+        scrollTrigger: { start: 0, end: "max", scrub: 0.3 },
+      });
+
       // ——— words inked in by scroll
       gsap.utils.toArray<HTMLElement>("[data-words]").forEach((p) => {
         gsap.to(p.querySelectorAll(".w"), {
@@ -90,6 +121,7 @@ export default function Motion() {
         const dec = Number(el.dataset.dec ?? 0);
         const pre = el.dataset.pre ?? "";
         const suf = el.dataset.suf ?? "";
+        const sep = el.dataset.sep !== undefined; // 5000 -> "5,000"
         const o = { v: 0 };
         ScrollTrigger.create({
           trigger: el,
@@ -101,7 +133,7 @@ export default function Motion() {
               duration: 1.6,
               ease: "expo.out",
               onUpdate: () => {
-                el.textContent = pre + o.v.toFixed(dec) + suf;
+                el.textContent = pre + (sep ? Math.round(o.v).toLocaleString("en-IN") : o.v.toFixed(dec)) + suf;
               },
             }),
         });
@@ -185,6 +217,7 @@ export default function Motion() {
             duration: 0.9,
             ease: "back.out(1.6)",
             stagger: 0.12,
+            clearProps: "transform",
           }),
       });
     });

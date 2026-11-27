@@ -11,6 +11,10 @@ export const college = {
   affiliation: "Affiliated to VTU, Belagavi",
   status: "Autonomous Institute",
   phone: "0821-427 6286",
+  // from vvce.ac.in/contact-us (checked 26 Nov 2026)
+  address: ["P.B. No. 206, Gokulam III Stage", "Mysuru 570 002, Karnataka"],
+  email: "ao@vvce.ac.in",
+  map: "https://maps.google.com/?q=Vidyavardhaka+College+of+Engineering,+Mysuru",
 };
 
 export const codes = [
@@ -58,7 +62,6 @@ export type Dept = {
   highestNote?: string;
   careers: string[];
   intro: string;
-  image: string;
 };
 
 export const departments: Dept[] = [
@@ -74,7 +77,6 @@ export const departments: Dept[] = [
     careers: ["AI Engineer", "Data Scientist", "ML Scientist", "Software Developer", "Cloud Architect"],
     intro:
       "Master programming, algorithms and cutting-edge technologies. Work across artificial intelligence, cybersecurity, data science and software development, and graduate ready to shape how technology is built across industries.",
-    image: "/img/campus-hero.webp",
   },
   {
     slug: "computer-science-engineering-ai-ml",
@@ -88,7 +90,6 @@ export const departments: Dept[] = [
     careers: ["Machine Learning Engineer", "AI Research Scientist", "Data Scientist", "Deep Learning Engineer"],
     intro:
       "Explore intelligent systems, data-driven algorithms and the technologies behind them — deep learning, natural language processing, computer vision and robotics — and build the automation that industries now run on.",
-    image: "/img/campus-1.webp",
   },
   {
     slug: "information-science-engineering",
@@ -110,7 +111,6 @@ export const departments: Dept[] = [
     ],
     intro:
       "Computer science, software engineering and data management alongside AI, machine learning and cybersecurity. The curriculum blends theory with practical work, preparing students for the breadth of the technology industry.",
-    image: "/img/campus-3.webp",
   },
   {
     slug: "electronics-communication-engineering",
@@ -131,7 +131,6 @@ export const departments: Dept[] = [
     ],
     intro:
       "Electronics, communication systems and the technologies built on them. Work across IoT, robotics, signal processing and telecommunications, from circuit level through to deployed systems.",
-    image: "/img/facility-2.webp",
   },
   {
     slug: "electrical-electronics-engineering",
@@ -152,7 +151,6 @@ export const departments: Dept[] = [
     ],
     intro:
       "Electrical systems, electronics and emerging technology together — power systems, automation, renewable energy and electronic design, with the lab work to back the theory.",
-    image: "/img/main-block.webp",
   },
   {
     slug: "mechanical-engineering",
@@ -167,7 +165,6 @@ export const departments: Dept[] = [
     careers: ["Design Engineer", "Manufacturing Engineer", "Automotive Engineer", "Thermal Engineer"],
     intro:
       "Core mechanical principles alongside advanced technology and hands-on work, across design, manufacturing, automation and sustainable engineering.",
-    image: "/img/campus-3.webp",
   },
   {
     slug: "civil-engineering",
@@ -188,7 +185,6 @@ export const departments: Dept[] = [
     ],
     intro:
       "Planning, designing and constructing the infrastructure people live in — with the technical depth and sustainable practice needed to build things that last.",
-    image: "/img/facility-2.webp",
   },
   {
     slug: "business-administration",
@@ -209,7 +205,6 @@ export const departments: Dept[] = [
     ],
     intro:
       "A two-year postgraduate programme across finance, marketing, human resources and operations, taught with the case work and industry contact that management practice demands.",
-    image: "/img/campus-1.webp",
   },
   {
     slug: "computer-applications",
@@ -223,7 +218,6 @@ export const departments: Dept[] = [
     careers: ["Software Developer", "Systems Analyst", "Application Developer", "Database Administrator"],
     intro:
       "A postgraduate programme in computer applications covering software development, systems design and modern application architecture, for graduates moving into professional software work.",
-    image: "/img/campus-hero.webp",
   },
 ];
 

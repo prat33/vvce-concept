@@ -53,20 +53,26 @@ export function Header() {
 
       <header className="pointer-events-none sticky top-3 z-50 px-gutter">
         <div
-          className={`pointer-events-auto mx-auto flex max-w-[84rem] items-center gap-4 rounded-full border px-3 py-2 pl-4 transition-[background-color,box-shadow,border-color] duration-300 ${
+          className={`pointer-events-auto mx-auto flex max-w-[84rem] items-center gap-3 rounded-full border py-2 pl-3 pr-2 transition-[background-color,box-shadow,border-color] duration-300 sm:gap-4 sm:pl-4 sm:pr-3 ${
             solid
               ? "border-line bg-card/90 shadow-[0_10px_40px_-12px_rgba(28,29,69,.25)] backdrop-blur-md"
               : "border-white/25 bg-white/10 backdrop-blur-md"
           }`}
         >
-          <a href="#top" className="flex items-center gap-2.5" aria-label="VVCE — back to top">
-            <Image src="/img/vvce-logo.webp" alt="" width={40} height={40} className="h-9 w-9" priority />
-            <span className="leading-tight">
-              <span className={`block font-display text-[1.05rem] ${solid ? "text-navy" : "text-white"}`}>
-                Vidyavardhaka College
+          <a href="#top" className="flex min-w-0 items-center gap-2 sm:gap-2.5" aria-label="VVCE — back to top">
+            <Image src="/img/vvce-logo.webp" alt="" width={40} height={40} className="h-8 w-8 shrink-0 sm:h-9 sm:w-9" priority />
+            <span className="min-w-0 leading-tight">
+              {/* the full name always on one line: on phones the size follows the screen width
+                  (what's left beside the logo and menu button), from sm up it is fixed */}
+              <span
+                className={`block whitespace-nowrap font-display text-[clamp(0.69rem,5.4vw-0.5rem,1.05rem)] sm:text-[0.95rem] lg:text-[1.05rem] ${
+                  solid ? "text-navy" : "text-white"
+                }`}
+              >
+                Vidyavardhaka College of Engineering
               </span>
               <span className={`block text-[0.68rem] tracking-wide ${solid ? "text-muted" : "text-white/70"}`}>
-                of Engineering · Mysuru
+                Autonomous · Mysuru
               </span>
             </span>
           </a>
@@ -87,10 +93,10 @@ export function Header() {
 
           <a
             href="#admissions"
-            className="ml-auto hidden items-center gap-2 rounded-full bg-gold px-4 py-2.5 text-[0.9rem] font-semibold text-navy transition-transform hover:scale-[1.03] active:scale-[.97] sm:inline-flex lg:ml-2"
+            className="group ml-auto hidden shrink-0 items-center gap-2 rounded-full bg-gold px-4 py-2.5 text-[0.9rem] font-semibold text-navy transition-transform hover:scale-[1.03] active:scale-[.97] sm:inline-flex lg:ml-2 lg:hidden xl:inline-flex"
           >
             Admission enquiry
-            <span className="grid h-6 w-6 place-items-center rounded-full bg-navy text-[0.8rem] text-gold">→</span>
+            <span className="grid h-6 w-6 place-items-center rounded-full bg-navy text-[0.8rem] text-gold transition-transform duration-300 group-hover:translate-x-0.5">→</span>
           </a>
 
           <button
@@ -159,7 +165,14 @@ export function CampusPanels({ panels }: { panels: Panel[] }) {
               on ? "lg:grow-[5]" : "lg:grow"
             } lg:basis-0`}
           >
-            <Image src={p.img} alt={p.alt} fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover transition-transform duration-700 group-hover:scale-[1.04]" />
+            {/* the open panel's photo drifts in slowly (a Ken Burns push), only where motion is welcome */}
+            <Image
+              src={p.img}
+              alt={p.alt}
+              fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              className={`object-cover transition-transform duration-700 ease-out ${on ? "motion-safe:scale-[1.08] motion-safe:duration-[6000ms]" : ""}`}
+            />
             <span className="absolute inset-0 bg-gradient-to-t from-navy/90 via-navy/25 to-transparent" />
             {/* collapsed label, rotated, desktop only */}
             {/* collapsed label: vertical writing, reading bottom-to-top, so it
@@ -214,8 +227,13 @@ export function Events({ events }: { events: Event[] }) {
         </div>
       </div>
       <ul className="mt-5 space-y-2.5" aria-live="polite">
-        {shown.map((e) => (
-          <li key={e.title} className="flex items-center gap-4 rounded-2xl border border-line bg-card px-4 py-3.5 transition-shadow hover:shadow-[0_8px_30px_-14px_rgba(28,29,69,.3)]">
+        {/* keyed by filter + title, so switching filters re-mounts the rows and they rise in again */}
+        {shown.map((e, i) => (
+          <li
+            key={cat + e.title}
+            className="rise-in flex items-center gap-4 rounded-2xl border border-line bg-card px-4 py-3.5 transition-[box-shadow,translate] duration-300 hover:translate-x-1 hover:shadow-[0_8px_30px_-14px_rgba(28,29,69,.3)]"
+            style={{ animationDelay: `${i * 45}ms` }}
+          >
             <span className="grid w-12 shrink-0 text-center leading-none">
               <span className="tnum font-display text-[1.6rem] text-navy">{e.day}</span>
               <span className="mt-1 text-[0.66rem] font-semibold uppercase tracking-[0.14em] text-muted">{e.mon}</span>
@@ -236,9 +254,20 @@ export function Events({ events }: { events: Event[] }) {
 export function LogoMarquee({ logos }: { logos: { name: string; img: string }[] }) {
   const [paused, setPaused] = useState(false);
   const row = (hidden: boolean) => (
-    <div aria-hidden={hidden || undefined} className="items-center gap-16 pr-16" style={{ ["--dur" as string]: "32s" }}>
+    <div aria-hidden={hidden || undefined} className="items-center gap-20 pr-20" style={{ ["--dur" as string]: "40s" }}>
+      {/* logo files are trimmed to their artwork with the white made transparent (a blend
+          mode can't do it: the fade mask isolates the strip); a fixed box keeps tall and wide
+          marks at a similar visual size */}
       {logos.map((l) => (
-        <Image key={l.name + hidden} src={l.img} alt={hidden ? "" : l.name} width={120} height={68} className="h-9 w-auto opacity-70 grayscale" />
+        <span key={l.name + hidden} className="flex h-14 w-40 shrink-0 items-center justify-center">
+          <Image
+            src={l.img}
+            alt={hidden ? "" : l.name}
+            width={200}
+            height={76}
+            className="max-h-12 w-auto max-w-full object-contain opacity-80 grayscale transition duration-300 hover:opacity-100 hover:grayscale-0"
+          />
+        </span>
       ))}
     </div>
   );
@@ -251,7 +280,7 @@ export function LogoMarquee({ logos }: { logos: { name: string; img: string }[] 
       <button
         type="button"
         onClick={() => setPaused((p) => !p)}
-        className="mt-5 rounded-full border border-line px-3 py-1.5 text-[0.75rem] font-medium text-ink-2 hover:border-navy/30"
+        className="mx-auto mt-6 block rounded-full border border-line px-3 py-1.5 text-[0.75rem] font-medium text-ink-2 hover:border-navy/30"
       >
         {paused ? "▶ Play" : "❚❚ Pause"} logos
       </button>
@@ -272,8 +301,11 @@ export function ConceptNotice() {
     // Let the hero land first: appear once the visitor scrolls past most of
     // the first screen, or after eight seconds, whichever comes first. The
     // footer carries the same disclosure permanently.
+    // On a phone the hero buttons sit where the bar would land, so wait for the
+    // scroll there (by 60% of a screen the buttons have moved up out of its way).
     const show = () => setOpen(true);
-    const t = setTimeout(show, 8000);
+    const phone = window.matchMedia("(max-width: 639px)").matches;
+    const t = phone ? undefined : setTimeout(show, 8000);
     const onScroll = () => {
       if (window.scrollY > window.innerHeight * 0.6) show();
     };
@@ -284,32 +316,31 @@ export function ConceptNotice() {
     };
   }, []);
   if (!open) return null;
+  const dismiss = () => {
+    setOpen(false);
+    try {
+      localStorage.setItem("pulplabs-concept", "1");
+    } catch {}
+  };
+  const gotIt = (cls: string) => (
+    <button type="button" onClick={dismiss} className={`shrink-0 rounded-full bg-white/10 px-3 py-1 text-[0.75rem] font-medium text-white hover:bg-white/20 ${cls}`}>
+      Got it
+    </button>
+  );
   return (
+    // phones: one slim bar, so it never covers the hero buttons; wider screens: the full card
     <aside
       aria-label="About this page"
-      className="fixed bottom-20 left-3 right-3 z-[70] rounded-2xl border border-white/10 bg-navy/95 p-3.5 text-[0.78rem] leading-relaxed text-white/75 shadow-2xl backdrop-blur sm:bottom-4 sm:left-4 sm:right-auto sm:max-w-[21rem] sm:p-4 sm:text-[0.8rem]"
+      className="fixed bottom-20 left-3 right-3 z-[70] flex items-center justify-between gap-3 rounded-full border border-white/10 bg-navy/95 py-1.5 pl-4 pr-1.5 text-[0.75rem] leading-relaxed text-white/75 shadow-2xl backdrop-blur sm:bottom-4 sm:left-4 sm:right-auto sm:block sm:max-w-[21rem] sm:rounded-2xl sm:p-4 sm:text-[0.8rem]"
     >
-      <div className="flex items-start justify-between gap-3">
-        <p className="font-semibold text-white">A PulpLabs concept</p>
-        <button
-          type="button"
-          onClick={() => {
-            setOpen(false);
-            try {
-              localStorage.setItem("pulplabs-concept", "1");
-            } catch {}
-          }}
-          className="rounded-full bg-white/10 px-3 py-1 text-[0.75rem] font-medium text-white hover:bg-white/20"
-        >
-          Got it
-        </button>
-      </div>
-      <p className="mt-1.5 sm:hidden">
-        A redesign concept by <span className="text-gold-2">pulplabs.ai</span> — not VVCE&rsquo;s official site.{" "}
-        <a href="mailto:contact@pulplabs.ai" className="text-gold-2 underline underline-offset-2">
-          Contact
-        </a>
+      <p className="sm:hidden">
+        <span className="font-semibold text-white">PulpLabs concept</span> · not VVCE&rsquo;s official site
       </p>
+      {gotIt("sm:hidden")}
+      <div className="hidden items-start justify-between gap-3 sm:flex">
+        <p className="font-semibold text-white">A PulpLabs concept</p>
+        {gotIt("")}
+      </div>
       <p className="mt-2 hidden sm:block">
         A redesign concept by <span className="text-gold-2">pulplabs.ai</span>, not VVCE&rsquo;s official
         website, and not affiliated with or endorsed by the college. Figures come from vvce.ac.in. To have it

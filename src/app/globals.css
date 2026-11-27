@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 /* VVCE homepage concept — PulpLabs house style (after srikkec.pulplabs.ai):
-   warm paper ground, a soft display serif over a geometric sans, deep crest
-   navy with crest gold. */
+   warm paper ground, a crisp high-contrast display serif (Playfair Display)
+   over a geometric sans (Outfit), deep crest navy with crest gold. */
 
 @theme {
   --color-paper:    #f6f1e7;
@@ -24,7 +24,7 @@
   --color-mint:     #dff1e6;
   --color-rose:     #fbe3dc;
 
-  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-display: var(--font-playfair), ui-serif, Georgia, serif;
   --font-sans:    var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
 
   --text-hero:  clamp(2.6rem, 1.4rem + 4.6vw, 5.4rem);
@@ -54,13 +54,21 @@ body {
 
 h1, h2, h3 {
   font-family: var(--font-display);
-  font-weight: 500;
-  letter-spacing: -0.02em;
-  line-height: 1.05;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.08;
+  font-variant-numeric: lining-nums;
   text-wrap: balance;
 }
+/* the display face also sets names, figures and labels outside headings: same
+   weight as the headings so big numbers hold their own, and lining figures
+   (Playfair's default old-style figures bob up and down in stats). In the
+   components layer so a font-weight utility can still override it. */
+@layer components {
+  .font-display { font-weight: 600; font-variant-numeric: lining-nums; }
+}
 p { text-wrap: pretty; }
-.tnum { font-variant-numeric: tabular-nums; }
+.tnum { font-variant-numeric: lining-nums tabular-nums; }
 :focus-visible { outline: 2.5px solid var(--color-gold); outline-offset: 3px; border-radius: 6px; }
 a, button { -webkit-tap-highlight-color: transparent; }
 ::selection { background: var(--color-gold-wash); }
@@ -84,6 +92,40 @@ a, button { -webkit-tap-highlight-color: transparent; }
 .motion-ok [data-hero-line] { transform: translate3d(0, 110%, 0); }
 .motion-ok [data-hero-fade] { opacity: 0; transform: translate3d(0, 16px, 0); }
 .motion-ok [data-badge] { opacity: 0; }
+/* section headings: each word waits below its own mask (Motion.tsx lifts them) */
+.motion-ok [data-split] .sw > span { transform: translate3d(0, 110%, 0); }
+/* list rows slide in from the left (from the right they'd poke past a phone's
+   edge and make the page scroll sideways); admission codes pop */
+.motion-ok [data-row] { opacity: 0; transform: translate3d(-28px, 0, 0); }
+.motion-ok [data-pop] { opacity: 0; transform: scale(.85); }
+
+/* ——— small idle and hover motion, CSS only ————————————————————————— */
+@keyframes float-y { 0%, 100% { transform: translate3d(0, 0, 0); } 50% { transform: translate3d(0, -8px, 0); } }
+.motion-ok .float-y { animation: float-y 6s ease-in-out infinite; }
+@keyframes rise-in { from { opacity: 0; transform: translate3d(0, 10px, 0); } }
+.motion-ok .rise-in { animation: rise-in .55s var(--ease-out-expo) both; }
+
+/* ——— programme scenes (ProgramArt.tsx) ———————————————————————————
+   each moving part declares its animation in --a and its pivot in --o */
+.motion-ok [data-a] { animation: var(--a); transform-box: fill-box; transform-origin: var(--o, center); }
+.art-motion-only { display: none; }
+.motion-ok .art-motion-only { display: inline; }
+@keyframes art-spin { to { transform: rotate(360deg); } }
+@keyframes art-spin-rev { to { transform: rotate(-360deg); } }
+@keyframes art-type { 0% { transform: scaleX(0); opacity: 1; } 12%, 82% { transform: scaleX(1); opacity: 1; } 94%, 100% { transform: scaleX(1); opacity: 0; } }
+@keyframes art-blink { 50% { opacity: 0; } }
+@keyframes art-flow { from { stroke-dashoffset: 14; } to { stroke-dashoffset: -100; } }
+@keyframes art-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(var(--s, 1.22)); } }
+@keyframes art-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(var(--y, -6px)); } }
+@keyframes art-slide { to { transform: translateX(var(--x, 50px)); } }
+@keyframes art-packet { 0% { transform: translateX(0); opacity: 0; } 15%, 80% { opacity: 1; } 100% { transform: translateX(var(--x, 60px)); opacity: 0; } }
+@keyframes art-orbit { from { offset-distance: 0%; } to { offset-distance: 100%; } }
+@keyframes art-glow { 0%, 100% { opacity: var(--lo, .15); } 50% { opacity: var(--hi, .6); } }
+@keyframes art-grow { 0% { transform: scaleY(.1); } 18%, 84% { transform: scaleY(1); } 100% { transform: scaleY(.1); } }
+@keyframes art-draw { 0% { stroke-dashoffset: 100; opacity: 1; } 24%, 84% { stroke-dashoffset: 0; opacity: 1; } 96%, 100% { stroke-dashoffset: 0; opacity: 0; } }
+@keyframes art-appear { 0%, 20% { opacity: 0; } 26%, 84% { opacity: 1; } 96%, 100% { opacity: 0; } }
+@keyframes art-drive { from { transform: translateX(0); } to { transform: translateX(var(--x, 260px)); } }
+@keyframes art-scroll-y { to { transform: translateY(var(--y, -48px)); } }
 
 /* hero photograph: a slow push-in, the srikkec "hero-zoom" */
 @keyframes hero-zoom { from { transform: scale(1.12); } to { transform: scale(1); } }

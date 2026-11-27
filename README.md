@@ -35,6 +35,6 @@ link resolves, no sideways scroll on a phone, and page weight.
 
 ## Stack
 
-Next.js static export · GSAP + ScrollTrigger · Lenis · Tailwind 4 · Fraunces and Outfit.
+Next.js static export · GSAP + ScrollTrigger · Lenis · Tailwind 4 · Playfair Display (headings) and Outfit (body).
 All motion lives in `src/components/Motion.tsx`; hidden states are scoped to
 `html.motion-ok`, so the page never depends on animation to be visible.

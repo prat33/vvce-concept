@@ -1,5 +1,7 @@
+import { Fragment } from "react";
 import Image from "next/image";
 import Motion from "@/components/Motion";
+import ProgramArt, { isDarkScene } from "@/components/ProgramArt";
 import { CampusPanels, ConceptNotice, Events, Header, LogoMarquee } from "@/components/client";
 import { clubs, codes, college, departments, placements, rankings, recruiters } from "@/data/site";
 
@@ -46,11 +48,26 @@ const events = [
 /* Names and roles exactly as published on vvce.ac.in/about and /principal. */
 const leaders = [
   { name: "Dr. B. Sadashive Gowda", role: "Principal", note: "Ph.D, IISc · ISTE Best Principal 2022", img: "/img/lead-principal.webp", strap: "#1c1d45" },
-  { name: "Sri Gundappa Gowda", role: "President, Vidyavardhaka Sangha", note: "", img: "/img/lead-president.webp", strap: "#e9a92b" },
+  { name: "Sri Gundappa Gowda", role: "President", note: "Vidyavardhaka Sangha", img: "/img/lead-president.webp", strap: "#e9a92b" },
   { name: "Sri Shivalingappa B", role: "Vice President", note: "Vidyavardhaka Sangha", img: "/img/lead-vice-president.webp", strap: "#2f7d55" },
   { name: "Sri P. Vishwanath", role: "Secretary", note: "Vidyavardhaka Sangha", img: "/img/lead-secretary.webp", strap: "#c2502f" },
   { name: "Sri Shrishaila Ramannavar", role: "Treasurer", note: "Vidyavardhaka Sangha", img: "/img/lead-treasurer.webp", strap: "#3c3f86" },
 ];
+
+/* Heading text split into words, each in its own mask, so Motion.tsx can lift
+   them one by one (put data-split on the heading). The padding gives
+   descenders room inside the mask; the negative margin keeps the line height. */
+function Split({ text }: { text: string }) {
+  const words = text.split(" ");
+  return words.map((w, i) => (
+    <Fragment key={i}>
+      <span className="sw -mb-[0.16em] inline-block overflow-hidden pb-[0.16em] align-top">
+        <span className="inline-block">{w}</span>
+      </span>
+      {i < words.length - 1 ? " " : null}
+    </Fragment>
+  ));
+}
 
 const band = ["Autonomous institute", "NAAC “A” grade", "NBA accredited · all UG branches", "Affiliated to VTU, Belagavi", "250+ recruiters", "Since 1997"];
 
@@ -58,6 +75,13 @@ export default function Home() {
   return (
     <>
       <Header />
+      {/* reading progress: Motion.tsx scales it with the scroll; without motion it stays at zero width */}
+      <div
+        aria-hidden="true"
+        data-progress=""
+        className="pointer-events-none fixed inset-x-0 top-0 z-[90] h-[3px] bg-gold"
+        style={{ transform: "scaleX(0)", transformOrigin: "0 50%" }}
+      />
 
       <main id="main" className="-mt-[4.6rem]">
         {/* ——— hero ———————————————————————————————————————————————— */}
@@ -70,7 +94,8 @@ export default function Home() {
           <div className="mx-auto grid w-full max-w-[84rem] items-end gap-10 px-gutter pb-14 pt-40 md:pb-20 lg:grid-cols-[1.35fr_0.65fr]">
             <div className="text-white">
               <p data-hero-fade="" className="eyebrow !text-gold-2">
-                Autonomous · NAAC “A” · NBA · Since 1997 · Mysuru
+                {/* one line on a phone: NBA and Mysuru (already in the headline) drop out */}
+                Autonomous · NAAC “A” · <span className="hidden sm:inline">NBA · </span>Since 1997<span className="hidden sm:inline"> · Mysuru</span>
               </p>
               <h1 className="mt-5 text-hero font-normal">
                 {["Building engineers", "in Mysuru,", "since 1997."].map((l) => (
@@ -86,8 +111,8 @@ export default function Home() {
                 postgraduate programmes, 250+ faculty and graduates placed at HPE, Juspay and SAP.
               </p>
               <div data-hero-fade="" className="mt-8 flex flex-wrap gap-3">
-                <a href="#programmes" className="inline-flex items-center gap-2 rounded-full bg-gold px-6 py-3.5 font-semibold text-navy transition-transform hover:scale-[1.03] active:scale-[.97]">
-                  Explore programmes <span aria-hidden="true">→</span>
+                <a href="#programmes" className="group inline-flex items-center gap-2 rounded-full bg-gold px-6 py-3.5 font-semibold text-navy transition-transform hover:scale-[1.03] active:scale-[.97]">
+                  Explore programmes <span aria-hidden="true" className="inline-block transition-transform duration-300 group-hover:translate-x-1">→</span>
                 </a>
                 <a href="#campus" className="inline-flex items-center gap-2 rounded-full border border-white/35 px-6 py-3.5 font-medium text-white backdrop-blur-sm transition-colors hover:bg-white/10">
                   See the campus
@@ -95,7 +120,9 @@ export default function Home() {
               </div>
             </div>
 
-            {/* floating admissions card */}
+            {/* floating admissions card: the wrapper bobs gently, so the card's own
+                transform stays free for the hero fade-in and the hover lift */}
+            <div className="float-y">
             <a
               href="#admissions"
               data-hero-fade=""
@@ -115,6 +142,7 @@ export default function Home() {
                 <span className="grid h-9 w-9 place-items-center rounded-full bg-gold text-navy transition-transform group-hover:translate-x-1">→</span>
               </span>
             </a>
+            </div>
           </div>
         </section>
 
@@ -123,8 +151,8 @@ export default function Home() {
           <div className="grid items-start gap-14 lg:grid-cols-[1.25fr_0.75fr] lg:gap-20">
             <div>
               <p data-reveal="" className="eyebrow">About the college</p>
-              <h2 data-reveal="" className="mt-3 max-w-[18ch] text-h2 text-navy">
-                An autonomous campus with a record to show for it
+              <h2 data-split="" className="mt-3 max-w-[18ch] text-h2 text-navy">
+                <Split text="An autonomous campus with a record to show for it" />
               </h2>
               <Words
                 className="mt-8 max-w-[38ch] font-display text-[clamp(1.35rem,1.1rem+0.9vw,1.9rem)] leading-[1.35] text-navy"
@@ -145,7 +173,7 @@ export default function Home() {
                   ["Established", "Vidyavardhaka Sangha, Mysuru", <span key="y" data-count="1997">1997</span>],
                   ["Status", "Affiliated to VTU, Belagavi", "Autonomous"],
                   ["Accreditation", "NBA, all UG branches", "NAAC “A”"],
-                  ["Students", "Across UG, PG and research", <span key="s">5,000+</span>],
+                  ["Students", "Across UG, PG and research", <span key="s" data-count="5000" data-sep="" data-suf="+">5,000+</span>],
                   ["Faculty", "Qualified teaching staff", <span key="f" data-count="250" data-suf="+">250+</span>],
                   ["Highest offer", "Mechanical · SPIRE LLC, Dubai", <span key="h" data-count="43.1" data-dec="1" data-pre="₹" data-suf=" L">₹43.1 L</span>],
                 ].map(([k, sub, v]) => (
@@ -190,7 +218,7 @@ export default function Home() {
             <div className="flex flex-wrap items-end justify-between gap-6">
               <div>
                 <p data-reveal="" className="eyebrow">Programmes</p>
-                <h2 data-reveal="" className="mt-3 max-w-[16ch] text-h2 text-navy">From first lab to final offer</h2>
+                <h2 data-split="" className="mt-3 max-w-[16ch] text-h2 text-navy"><Split text="From first lab to final offer" /></h2>
               </div>
               <p data-reveal="" className="max-w-sm text-ink-2">
                 Nine departments teaching six B.E. and six postgraduate programmes, all on VVCE&rsquo;s own autonomous curriculum.
@@ -203,22 +231,28 @@ export default function Home() {
             <ul data-htrack="" className="flex w-max snap-x snap-mandatory gap-5 px-gutter lg:snap-none">
               {departments.map((d, i) => (
                 <li key={d.slug} className="w-[19rem] shrink-0 snap-start sm:w-[22rem]">
-                  <article className="flex h-full flex-col overflow-hidden rounded-[1.5rem] border border-line bg-card">
+                  <article className="flex h-full flex-col overflow-hidden rounded-[1.5rem] border border-line bg-card transition-[transform,box-shadow] duration-500 ease-[cubic-bezier(.16,1,.3,1)] hover:-translate-y-1.5 hover:shadow-[0_24px_44px_-24px_rgba(28,29,69,.45)]">
+                    {/* a drawn, animated scene for the subject (ProgramArt.tsx) */}
                     <div className="relative h-44 overflow-hidden">
-                      <Image src={d.image} alt="" fill sizes="22rem" className="object-cover" />
+                      <ProgramArt slug={d.slug} />
                       <span className="absolute left-4 top-4 rounded-full bg-card/90 px-3 py-1 text-[0.72rem] font-semibold text-navy backdrop-blur">
                         {d.level === "UG" ? "B.E." : "Postgraduate"} · {d.duration} yrs
                       </span>
-                      <span className="absolute right-4 top-4 font-display text-[0.95rem] text-white/90">{String(i + 1).padStart(2, "0")}</span>
+                      <span className={`absolute right-4 top-4 font-display text-[0.95rem] ${isDarkScene(d.slug) ? "text-white/80" : "text-navy/60"}`}>
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
                     </div>
                     <div className="flex flex-1 flex-col p-6">
                       <h3 className="text-h3 text-navy">{d.name}</h3>
                       <p className="mt-3 line-clamp-3 text-[0.92rem] text-ink-2">{d.intro}</p>
                       <dl className="mt-auto grid grid-cols-2 gap-4 border-t border-line pt-5">
-                        <div>
-                          <dt className="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-muted">Intake</dt>
-                          <dd className="tnum mt-1 font-display text-2xl text-navy">{d.intake ?? "—"}{d.slug.endsWith("ai-ml") && <sup className="ml-0.5 text-[0.7rem] text-coral">*</sup>}</dd>
-                        </div>
+                        {/* vvce.ac.in publishes no intake for some departments (ISE): leave the field out rather than show a dash */}
+                        {d.intake != null && (
+                          <div>
+                            <dt className="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-muted">Intake</dt>
+                            <dd className="tnum mt-1 font-display text-2xl text-navy">{d.intake}{d.slug.endsWith("ai-ml") && <sup className="ml-0.5 text-[0.7rem] text-coral">*</sup>}</dd>
+                          </div>
+                        )}
                         <div>
                           <dt className="text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-muted">Highest offer</dt>
                           <dd className="tnum mt-1 font-display text-2xl text-navy">{d.highest ? d.highest.replace(" LPA", " L") : "—"}</dd>
@@ -243,7 +277,7 @@ export default function Home() {
             <div className="grid gap-14 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
               <div>
                 <p data-reveal="" className="eyebrow !text-gold-2">Placements 2025–26</p>
-                <h2 data-reveal="" className="mt-3 text-h2">The offers on the table</h2>
+                <h2 data-split="" className="mt-3 text-h2"><Split text="The offers on the table" /></h2>
                 <div data-reveal="" className="mt-10 flex items-end gap-4">
                   <span className="tnum font-display text-[clamp(4.5rem,3rem+5vw,7.5rem)] leading-[0.85] text-gold-2" data-count="27" data-pre="₹" data-suf="L">
                     ₹27L
@@ -255,8 +289,12 @@ export default function Home() {
                   </span>
                 </div>
                 <dl data-reveal="" className="mt-10 grid grid-cols-3 gap-4 border-t border-white/15 pt-6">
-                  {[["250+", "companies visited"], ["₹43.1L", "department record"], ["12", "offers from HPE alone"]].map(([v, l]) => (
-                    <div key={l}>
+                  {[
+                    [<span key="c" data-count="250" data-suf="+">250+</span>, "companies visited"],
+                    [<span key="r" data-count="43.1" data-dec="1" data-pre="₹" data-suf="L">₹43.1L</span>, "department record"],
+                    [<span key="h" data-count="12">12</span>, "offers from HPE alone"],
+                  ].map(([v, l]) => (
+                    <div key={l as string}>
                       <dd className="tnum font-display text-[1.9rem] leading-none text-white">{v}</dd>
                       <dt className="mt-2 text-[0.8rem] text-white/65">{l}</dt>
                     </div>
@@ -266,7 +304,7 @@ export default function Home() {
 
               <ol className="divide-y divide-white/10 border-y border-white/10">
                 {offers.map((p, i) => (
-                  <li key={p.name} data-reveal="" className="grid grid-cols-[2.2rem_1fr_auto] items-center gap-4 py-4">
+                  <li key={p.name} data-row="" className="grid grid-cols-[2.2rem_1fr_auto] items-center gap-4 py-4 transition-colors hover:bg-white/[.04]">
                     <span className="tnum text-[0.8rem] text-white/45">{String(i + 1).padStart(2, "0")}</span>
                     <span className="min-w-0">
                       <span className="block truncate font-medium">{p.name}</span>
@@ -295,7 +333,7 @@ export default function Home() {
           <div className="grid gap-14 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
             <div>
               <p data-reveal="" className="eyebrow">Recognition</p>
-              <h2 data-reveal="" className="mt-3 text-h2 text-navy">A shelf that keeps filling up</h2>
+              <h2 data-split="" className="mt-3 text-h2 text-navy"><Split text="A shelf that keeps filling up" /></h2>
               <div data-reveal="" className="mt-10 flex items-end gap-4">
                 <span className="tnum font-display text-[clamp(4.5rem,3rem+5vw,7.5rem)] leading-[0.85] text-navy" data-count="38" data-suf="th">
                   38th
@@ -309,7 +347,7 @@ export default function Home() {
             </div>
             <ol className="border-t border-line">
               {rankings.map((r, i) => (
-                <li key={r.body + r.rank} data-reveal="" className="grid grid-cols-[2.2rem_1fr_auto] items-center gap-4 border-b border-line py-5">
+                <li key={r.body + r.rank} data-row="" className="group grid grid-cols-[2.2rem_1fr_auto] items-center gap-4 border-b border-line py-5">
                   <span className="tnum text-[0.8rem] text-muted">{String(i + 1).padStart(2, "0")}</span>
                   <span>
                     <span className="block font-display text-[1.25rem] leading-snug text-navy">
@@ -317,7 +355,7 @@ export default function Home() {
                     </span>
                     <span className="block text-[0.85rem] text-muted">{r.body}</span>
                   </span>
-                  <span className="rounded-full border border-line bg-card px-3 py-1 text-[0.72rem] font-medium text-ink-2">
+                  <span className="rounded-full border border-line bg-card px-3 py-1 text-[0.72rem] font-medium text-ink-2 transition-colors duration-300 group-hover:border-navy group-hover:bg-navy group-hover:text-white">
                     {r.body.split(" ")[0]}
                   </span>
                 </li>
@@ -330,20 +368,21 @@ export default function Home() {
         <section className="overflow-hidden pb-section" aria-labelledby="leaders-h">
           <div className="mx-auto max-w-[84rem] px-gutter text-center">
             <p data-reveal="" className="eyebrow">Leadership</p>
-            <h2 id="leaders-h" data-reveal="" className="mt-3 text-h2 text-navy">The people who lead VVCE</h2>
+            <h2 id="leaders-h" data-split="" className="mt-3 text-h2 text-navy"><Split text="The people who lead VVCE" /></h2>
             <p data-reveal="" className="mx-auto mt-4 max-w-xl text-ink-2">
               The college is run by Vidyavardhaka Sangha, a Mysuru education trust founded in 1949 that today runs ten institutions.
             </p>
           </div>
           <ul className="mx-auto mt-6 flex max-w-[84rem] snap-x snap-mandatory gap-6 overflow-x-auto px-gutter pb-10 pt-2 [scrollbar-width:none] lg:justify-center lg:overflow-visible">
             {leaders.map((p) => (
-              <li key={p.name} data-badge="" className="group w-[13.5rem] shrink-0 snap-center origin-top transition-transform duration-500 ease-[cubic-bezier(.16,1,.3,1)] hover:rotate-[2.5deg]">
+              <li key={p.name} data-badge="" className="group flex w-[13.5rem] shrink-0 snap-center flex-col origin-top transition-transform duration-500 ease-[cubic-bezier(.16,1,.3,1)] hover:rotate-[2.5deg]">
                 {/* lanyard and clip */}
                 <svg className="mx-auto block" width="74" height="86" viewBox="0 0 74 86" aria-hidden="true">
                   <path d="M10 0 L37 74 L64 0" fill="none" stroke={p.strap} strokeWidth="11" strokeLinejoin="round" />
                 </svg>
                 <span className="mx-auto -mt-3 block h-5 w-9 rounded-[5px] border border-[#a9abb8] bg-gradient-to-b from-[#e7e8ee] to-[#b8bac6]" aria-hidden="true" />
-                <article className="-mt-1 overflow-hidden rounded-2xl border border-line bg-card text-left shadow-[0_24px_40px_-22px_rgba(28,29,69,.45)]">
+                {/* flex-1: every badge stretches to the tallest, so a two-line name doesn't make one card longer */}
+                <article className="-mt-1 flex flex-1 flex-col overflow-hidden rounded-2xl border border-line bg-card text-left shadow-[0_24px_40px_-22px_rgba(28,29,69,.45)]">
                   <div className="flex items-center justify-between px-3.5 py-2.5" style={{ background: p.strap }}>
                     <span className="flex items-center gap-2">
                       <Image src="/img/vvce-logo.webp" alt="" width={20} height={20} className="h-5 w-5 rounded-full bg-white p-px" />
@@ -373,7 +412,7 @@ export default function Home() {
             <div className="flex flex-wrap items-end justify-between gap-6">
               <div>
                 <p data-reveal="" className="eyebrow">Life at VVCE</p>
-                <h2 data-reveal="" className="mt-3 max-w-[14ch] text-h2 text-navy">A campus that keeps you busy</h2>
+                <h2 data-split="" className="mt-3 max-w-[14ch] text-h2 text-navy"><Split text="A campus that keeps you busy" /></h2>
               </div>
               <p data-reveal="" className="max-w-sm text-ink-2">Labs in the morning, courts in the evening, a club for nearly everything in between.</p>
             </div>
@@ -402,23 +441,25 @@ export default function Home() {
         {/* ——— notices ——————————————————————————————————————————————— */}
         <section id="notices" className="mx-auto max-w-[84rem] px-gutter py-section">
           <p data-reveal="" className="eyebrow">Campus happenings</p>
-          <h2 data-reveal="" className="mt-3 max-w-[16ch] text-h2 text-navy">Circulars &amp; the latest on campus</h2>
+          <h2 data-split="" className="mt-3 max-w-[16ch] text-h2 text-navy"><Split text="Circulars & the latest on campus" /></h2>
 
           <div className="mt-12 grid gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:gap-14">
             <div className="cork rounded-[1.6rem] p-6 shadow-[inset_0_2px_10px_rgba(0,0,0,.12)] sm:p-8">
               <h3 className="mb-5 font-display text-[1.35rem] text-navy">Notice board</h3>
               <ul className="grid gap-5">
                 {slips.map((s, i) => (
-                  <li
-                    key={s.title}
-                    data-slip=""
-                    className={`relative rounded-md ${s.bg} px-5 pb-4 pt-6 shadow-[0_8px_18px_-8px_rgba(60,40,10,.45)]`}
-                    style={{ transform: `rotate(${i % 2 ? 0.8 : -0.8}deg)` }}
-                  >
-                    <span className={`absolute left-1/2 top-2 h-3.5 w-3.5 -translate-x-1/2 rounded-full ${s.pin} shadow-[0_2px_3px_rgba(0,0,0,.35)]`} aria-hidden="true" />
-                    <span className="text-[0.66rem] font-semibold uppercase tracking-[0.18em] text-ink-2">{s.kind}</span>
-                    <span className="mt-1 block font-display text-[1.08rem] leading-snug text-navy">{s.title}</span>
-                    <span className="mt-1 block text-[0.78rem] text-ink-2">{s.date}</span>
+                  // the <li> takes GSAP's drop-in; the inner slip owns the resting tilt
+                  // and the hover straighten, so a CSS transition never fights GSAP
+                  <li key={s.title} data-slip="">
+                    <div
+                      className={`relative rounded-md ${s.bg} px-5 pb-4 pt-6 shadow-[0_8px_18px_-8px_rgba(60,40,10,.45)] transition-transform duration-500 ease-[cubic-bezier(.16,1,.3,1)] [transform:rotate(var(--tilt))] hover:[transform:rotate(0deg)_translateY(-4px)]`}
+                      style={{ ["--tilt" as string]: `${i % 2 ? 0.8 : -0.8}deg` }}
+                    >
+                      <span className={`absolute left-1/2 top-2 h-3.5 w-3.5 -translate-x-1/2 rounded-full ${s.pin} shadow-[0_2px_3px_rgba(0,0,0,.35)]`} aria-hidden="true" />
+                      <span className="text-[0.66rem] font-semibold uppercase tracking-[0.18em] text-ink-2">{s.kind}</span>
+                      <span className="mt-1 block font-display text-[1.08rem] leading-snug text-navy">{s.title}</span>
+                      <span className="mt-1 block text-[0.78rem] text-ink-2">{s.date}</span>
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -436,13 +477,14 @@ export default function Home() {
             <Image src="/img/aerial-wide.webp" alt="" fill sizes="(max-width: 1344px) 100vw, 84rem" className="-z-10 object-cover opacity-30" />
             <div className="absolute inset-0 -z-10 bg-gradient-to-r from-navy via-navy/85 to-navy/40" />
             <p className="eyebrow !text-gold-2">Admissions 2026–27</p>
-            <h2 className="mt-4 max-w-[17ch] text-h2">Admissions for 2026–27 are now open</h2>
+            {/* each word is an unbreakable box, so "2026–27" stays on one line */}
+            <h2 data-split="" className="mt-4 max-w-[17ch] text-h2"><Split text="Admissions for 2026–27 are now open" /></h2>
             <p className="mt-5 max-w-[34rem] text-lead text-white/75">
               Apply through KCET, COMED-K or PGCET. Enter VVCE using these codes at option entry.
             </p>
             <dl className="mt-8 flex flex-wrap gap-3">
               {codes.slice(0, 5).map((c) => (
-                <div key={c.label} className="rounded-2xl border border-white/15 bg-white/5 px-4 py-3">
+                <div key={c.label} data-pop="" className="rounded-2xl border border-white/15 bg-white/5 px-4 py-3 transition-colors hover:border-gold-2/60 hover:bg-white/10">
                   <dt className="text-[0.7rem] uppercase tracking-[0.14em] text-white/60">{c.label}</dt>
                   <dd className="tnum font-display text-[1.5rem] leading-tight text-gold-2">{c.value}</dd>
                 </div>
@@ -463,7 +505,7 @@ export default function Home() {
       {/* ——— footer ——————————————————————————————————————————————————— */}
       <footer className="bg-navy text-white/70">
         <div className="mx-auto grid max-w-[84rem] gap-10 px-gutter py-14 md:grid-cols-[1.4fr_1fr_1fr]">
-          <div>
+          <div data-reveal="">
             <div className="flex items-center gap-3">
               <Image src="/img/vvce-logo.webp" alt="" width={44} height={44} className="h-11 w-11" />
               <span className="font-display text-xl text-white">VVCE, Mysuru</span>
@@ -472,7 +514,7 @@ export default function Home() {
               {college.name} · {college.status} · {college.affiliation} · Est. {college.established}
             </p>
           </div>
-          <nav aria-label="Footer">
+          <nav aria-label="Footer" data-reveal="">
             <p className="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-white/50">On this page</p>
             <ul className="mt-4 space-y-2 text-[0.92rem]">
               {[["About", "#about"], ["Programmes", "#programmes"], ["Placements", "#placements"], ["Campus", "#campus"], ["Notices", "#notices"], ["Admissions", "#admissions"]].map(([l, h]) => (
@@ -480,12 +522,16 @@ export default function Home() {
               ))}
             </ul>
           </nav>
-          <div>
+          <div data-reveal="">
             <p className="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-white/50">Admissions office</p>
-            <p className="mt-4 text-[0.92rem]">
-              <a href={`tel:${college.phone.replace(/\s/g, "")}`} className="text-gold-2 hover:underline">{college.phone}</a>
-              <br />Mysuru, Karnataka
-            </p>
+            <address className="mt-4 space-y-1 text-[0.92rem] not-italic">
+              <a href={`tel:${college.phone.replace(/\s/g, "")}`} className="block text-gold-2 hover:underline">{college.phone}</a>
+              <a href={`mailto:${college.email}`} className="block text-gold-2 hover:underline">{college.email}</a>
+              <span className="block pt-2">{college.address[0]}<br />{college.address[1]}</span>
+              <a href={college.map} target="_blank" rel="noopener noreferrer" className="inline-block pt-1 text-white/85 underline underline-offset-4 hover:text-white">
+                Open in Google Maps ↗
+              </a>
+            </address>
           </div>
         </div>
         <p className="mx-auto max-w-[84rem] border-t border-white/10 px-gutter py-6 text-[0.78rem] text-white/55">

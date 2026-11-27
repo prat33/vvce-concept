@@ -14,11 +14,14 @@ const check = (name, pass, detail) => results.push({ name, pass, detail });
 const hiddenCount = (page) =>
   page.evaluate(() => {
     let n = 0;
-    for (const el of document.querySelectorAll("[data-reveal],[data-hero-line],[data-hero-fade],[data-badge]")) {
+    const sel = "[data-reveal],[data-hero-line],[data-hero-fade],[data-badge],[data-row],[data-pop],[data-split] .sw > span";
+    for (const el of document.querySelectorAll(sel)) {
       const cs = getComputedStyle(el);
       const t = cs.transform;
-      const dy = t === "none" ? 0 : Math.abs(parseFloat(t.split(",")[5] ?? "0"));
-      if (parseFloat(cs.opacity) < 0.05 || dy > 4) n++;
+      const m = t === "none" ? [] : t.split(",");
+      const dx = Math.abs(parseFloat(m[4] ?? "0"));
+      const dy = Math.abs(parseFloat(m[5] ?? "0"));
+      if (parseFloat(cs.opacity) < 0.05 || dy > 4 || dx > 4) n++;
     }
     return n;
   });
@@ -99,16 +102,21 @@ const hiddenCount = (page) =>
     const bad = [...document.querySelectorAll('a[href^="#"]')]
       .map((a) => a.getAttribute("href"))
       .filter((h) => h.length > 1 && !document.querySelector(h));
+    // outbound links are allowed only as https, opening in a new tab with noopener
     const ext = [...document.querySelectorAll("a[href]")]
-      .map((a) => a.getAttribute("href"))
-      .filter((h) => !h.startsWith("#") && !h.startsWith("tel:") && !h.startsWith("mailto:"));
+      .filter((a) => {
+        const h = a.getAttribute("href");
+        if (h.startsWith("#") || h.startsWith("tel:") || h.startsWith("mailto:")) return false;
+        return !(h.startsWith("https://") && a.target === "_blank" && /noopener/.test(a.rel));
+      })
+      .map((a) => a.getAttribute("href"));
     return {
       bad: [...new Set(bad)],
       ext,
       overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
     };
   });
-  check("every link resolves", r.bad.length === 0 && r.ext.length === 0, r.bad.length || r.ext.length ? `dead: ${r.bad.join(" ")} external: ${r.ext.join(" ")}` : "all in-page, tel: or mailto:");
+  check("every link resolves", r.bad.length === 0 && r.ext.length === 0, r.bad.length || r.ext.length ? `dead: ${r.bad.join(" ")} external: ${r.ext.join(" ")}` : "all in-page, tel:, mailto: or safe https");
   check("phone: no sideways scroll", r.overflow <= 1, `${r.overflow}px`);
   await ctx.close();
 }

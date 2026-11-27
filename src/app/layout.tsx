@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
-import { Fraunces, Outfit } from "next/font/google";
+import { Outfit, Playfair_Display } from "next/font/google";
 import "./globals.css";
 
-const fraunces = Fraunces({
+const playfair = Playfair_Display({
   subsets: ["latin"],
-  variable: "--font-fraunces",
+  variable: "--font-playfair",
   display: "swap",
-  axes: ["opsz", "SOFT"],
 });
 
 const outfit = Outfit({
@@ -35,7 +34,7 @@ setTimeout(function(){if(!window.__motionReady){d.classList.remove('motion-ok');
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-IN" className={`${fraunces.variable} ${outfit.variable}`}>
+    <html lang="en-IN" className={`${playfair.variable} ${outfit.variable}`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: BOOT }} />
       </head>
